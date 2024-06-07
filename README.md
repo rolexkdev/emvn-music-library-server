@@ -68,3 +68,7 @@ Monitor live logs with docker compose
 ```bash
 docker compose logs -f app
 ```
+
+//TODO
+Develop a crawler script and crawl at least 100 playlists from Spotify or YouTube Music. The crawled data needs to be included in the database dump.
+Important: Do not use any external library or tool, all data should be crawled from your code.
