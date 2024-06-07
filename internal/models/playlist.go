@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -113,6 +114,35 @@ func (r *PlaylistRepository) FindMany(ctx context.Context) ([]*Playlist, error) 
 			return nil, err
 		}
 		playlists = append(playlists, playlist)
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return playlists, nil
+}
+
+func (r *PlaylistRepository) Search(ctx context.Context, searchKey string) ([]*Playlist, error) {
+	if searchKey == "" {
+		return nil, errors.New("search key cannot be empty")
+	}
+
+	filter := bson.M{}
+	filter["title"] = bson.M{"$regex": searchKey, "$options": "i"}
+
+	cursor, err := r.Collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var playlists []*Playlist
+	for cursor.Next(ctx) {
+		var playlist Playlist
+		if err := cursor.Decode(&playlist); err != nil {
+			return nil, err
+		}
+		playlists = append(playlists, &playlist)
 	}
 	if err := cursor.Err(); err != nil {
 		return nil, err

@@ -35,4 +35,8 @@ func InitHttpRoutes(r *gin.RouterGroup, conf *config.Config) {
 	playlists.POST("/:id/tracks", v1.UpdatePlaylistTrack)
 	playlists.GET("/:id/m3u", v1.GenerateM3UPlaylist)
 
+	//search
+	search := router.Group("/search")
+	search.GET("", v1.Search)
+
 }

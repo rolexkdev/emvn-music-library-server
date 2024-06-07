@@ -290,6 +290,35 @@ paths:
       summary: Add or remove a track for playlist
       tags:
       - playlist
+  /search:
+    get:
+      consumes:
+      - application/json
+      description: Search tracks and playlist
+      parameters:
+      - description: search string
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Search tracks and playlist
+      tags:
+      - search
   /tracks:
     post:
       consumes:

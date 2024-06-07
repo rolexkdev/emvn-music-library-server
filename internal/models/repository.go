@@ -25,6 +25,7 @@ type TrackRepositoryInterface interface {
 	Update(ctx context.Context, track *Track) error
 	Delete(ctx context.Context, trackID primitive.ObjectID) error
 	FindMany(ctx context.Context) ([]*Track, error)
+	Search(ctx context.Context, searchKey string) ([]*Track, error)
 }
 
 type PlaylistRepositoryInterface interface {
@@ -33,4 +34,5 @@ type PlaylistRepositoryInterface interface {
 	Update(ctx context.Context, playlist *Playlist) error
 	Delete(ctx context.Context, playlistID primitive.ObjectID) error
 	FindMany(ctx context.Context) ([]*Playlist, error)
+	Search(ctx context.Context, query string) ([]*Playlist, error)
 }
