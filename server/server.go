@@ -11,7 +11,7 @@ func InitServer(conf *config.Config) {
 	var appEngine *gin.Engine
 
 	// App
-	if serverConfig.Environment == config.DEVELOPMENT {
+	if serverConfig.Environment == config.Development {
 		gin.SetMode(gin.DebugMode)
 		appEngine = gin.Default()
 		appEngine.SetTrustedProxies([]string{"127.0.0.1"})
@@ -24,7 +24,7 @@ func InitServer(conf *config.Config) {
 	// Middlewares
 	appEngine.Use(middleware.CORS)
 
-	router := appEngine.Group("/" + serverConfig.AppVersion)
+	router := appEngine.Group("/api/" + serverConfig.AppVersion)
 
 	// Routes
 	InitHttpRoutes(router, conf)

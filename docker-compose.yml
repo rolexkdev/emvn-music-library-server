@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  db:
+    restart: always
+    image: mongo:latest
+    environment:
+      - DB_URI
+      - DB_NAME
+      - MONGO_INITDB_DATABASE=${DB_NAME:-"emvn"}
+    ports:
+      - 27077:27017
+    volumes:
+      - mongodb_data:/data/db
+
+  app:
+    image: emvn
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      - APP_HOST
+      - APP_ENV
+      - APP_POST
+      - APP_VERSION
+      - DB_URI=${DB_URI:-"mongodb://host:27017"}
+      - DB_NAME
+    ports:
+      - '${APP_PORT:-8089}:${APP_PORT:-8089}'
+
+volumes:
+  mongodb_data:

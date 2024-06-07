@@ -1,4 +1,485 @@
+definitions:
+  app.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+  dto.CreatePlaylistRequest:
+    properties:
+      album_cover:
+        type: string
+      title:
+        type: string
+      track_ids:
+        items:
+          type: string
+        type: array
+    required:
+    - album_cover
+    - title
+    type: object
+  dto.CreateTrackRequest:
+    properties:
+      album:
+        type: string
+      artist_id:
+        type: string
+      duration:
+        type: integer
+      file_url:
+        type: string
+      genre:
+        type: string
+      name:
+        type: string
+      release_date:
+        type: integer
+      title:
+        type: string
+    required:
+    - album
+    - artist_id
+    - duration
+    - file_url
+    - genre
+    - name
+    - release_date
+    - title
+    type: object
+  dto.UpdatePlaylistRequest:
+    properties:
+      album_cover:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.UpdatePlaylistTrackRequest:
+    properties:
+      id:
+        type: string
+      is_delete:
+        type: boolean
+    required:
+    - id
+    - is_delete
+    type: object
+  dto.UpdateTrackRequest:
+    properties:
+      album:
+        type: string
+      artist_id:
+        type: string
+      file_url:
+        type: string
+      genre:
+        type: string
+      name:
+        type: string
+      title:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /playlists:
+    post:
+      consumes:
+      - application/json
+      description: create a playlist
+      parameters:
+      - description: Create Playlist Request input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreatePlaylistRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Create a playlist
+      tags:
+      - playlist
+  /playlists/:
+    get:
+      consumes:
+      - application/json
+      description: Get list playlists
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Get list playlists
+      tags:
+      - playlist
+  /playlists/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a playlist by id
+      parameters:
+      - description: playlist id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Delete a playlist by id
+      tags:
+      - playlist
+    get:
+      consumes:
+      - application/json
+      description: Get a playlist
+      parameters:
+      - description: playlist id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Get a playlist
+      tags:
+      - playlist
+    put:
+      consumes:
+      - application/json
+      description: Update a playlist by id
+      parameters:
+      - description: playlist id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Playlist Request input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePlaylistRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Update a playlist by id
+      tags:
+      - playlist
+  /playlists/{id}/m3u:
+    get:
+      description: Generate M3U playlist
+      parameters:
+      - description: Playlist ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - audio/x-mpegurl
+      responses:
+        "200":
+          description: M3U playlist
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Generate M3U playlist
+      tags:
+      - playlist
+  /playlists/{id}/tracks:
+    post:
+      consumes:
+      - application/json
+      description: Add or remove a track for playlist
+      parameters:
+      - description: playlist id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Playlist Track Request input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePlaylistTrackRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Add or remove a track for playlist
+      tags:
+      - playlist
+  /tracks:
+    post:
+      consumes:
+      - application/json
+      description: create a track
+      parameters:
+      - description: Create Track Request input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTrackRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Create a track
+      tags:
+      - track
+  /tracks/:
+    get:
+      consumes:
+      - application/json
+      description: Get list tracks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Get list tracks
+      tags:
+      - track
+  /tracks/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a track by id
+      parameters:
+      - description: track id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Delete a track by id
+      tags:
+      - track
+    get:
+      consumes:
+      - application/json
+      description: Get a track
+      parameters:
+      - description: track id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Get a track
+      tags:
+      - track
+    put:
+      consumes:
+      - application/json
+      description: Update a track by id
+      parameters:
+      - description: track id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Track Request input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTrackRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Update a track by id
+      tags:
+      - track
+  /uploads:
+    post:
+      consumes:
+      - multipart/form-data
+      description: upload files
+      parameters:
+      - description: Files to upload
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Upload files
+      tags:
+      - upload
+  /uploads/{filename}:
+    get:
+      description: Get a file by its filename
+      parameters:
+      - description: Filename
+        in: path
+        name: filename
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: Retrieve file
+      tags:
+      - upload
 swagger: "2.0"

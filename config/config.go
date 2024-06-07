@@ -1,38 +1,22 @@
 package config
 
 import (
-	"errors"
-	"log"
+	"os"
 
-	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 )
 
 type ServerEnvironment string
 
 const (
-	DEVELOPMENT ServerEnvironment = "dev"
-	PRODUCTION  ServerEnvironment = "prod"
-
-	SERVER_APP_VERSION = "v1"
-	SERVER_PORT        = "8089"
-
-	LOGGER_DEVELOPMENT = true
-	LOGGER_LOG_LEVEL   = "debug"
-
-	DB_HOST     = ""
-	DB_PORT     = ""
-	DB_USER     = ""
-	DB_PASSWORD = ""
-	DB_NAME     = ""
-	DB_DRIVER   = "postgres"
+	Development ServerEnvironment = "dev"
+	Production  ServerEnvironment = "prod"
 )
 
 // App config struct
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
-	Metrics  Metrics
-	Logger   Logger
 }
 
 // Server config struct
@@ -43,58 +27,38 @@ type ServerConfig struct {
 	Environment ServerEnvironment
 }
 
-// Logger config
-type Logger struct {
-	Development       bool
-	DisableCaller     bool
-	DisableStacktrace bool
-	Encoding          string
-	Level             string
-}
-
-// Postgresql config
+// MongoDB config struct
 type DatabaseConfig struct {
-	Driver       string
-	Host         string
-	Port         string
-	User         string
-	Password     string
-	DatabaseName string
-	SSLMode      bool
+	URI      string
+	User     string
+	Password string
+	Name     string
 }
 
-// Metrics config
-type Metrics struct {
-	URL         string
-	ServiceName string
-}
-
-// Load config file from given path
-func LoadConfig(filename string) (*viper.Viper, error) {
-	v := viper.New()
-
-	v.SetConfigName(filename)
-	v.AddConfigPath(".")
-	v.AutomaticEnv()
-	if err := v.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			return nil, errors.New("config file not found")
-		}
-		return nil, err
-	}
-
-	return v, nil
-}
-
-// Parse config file
-func ParseConfig(v *viper.Viper) (*Config, error) {
-	var c Config
-
-	err := v.Unmarshal(&c)
+func LoadConfig() (*Config, error) {
+	err := godotenv.Load(".env")
 	if err != nil {
-		log.Printf("unable to decode into struct, %v", err)
 		return nil, err
 	}
 
-	return &c, nil
+	config := &Config{
+		Server: ServerConfig{
+			AppVersion:  getEnv("APP_VERSION", "v1"),
+			Host:        getEnv("APP_HOST", "0.0.0.0"),
+			Port:        getEnv("APP_PORT", "8089"),
+			Environment: ServerEnvironment(getEnv("APP_ENV", string(Development))),
+		},
+		Database: DatabaseConfig{
+			URI:  getEnv("DB_URI", "mongodb://localhost:27017"),
+			Name: getEnv("DB_NAME", "test"),
+		},
+	}
+	return config, nil
+}
+
+func getEnv(key, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
 }
